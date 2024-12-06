@@ -50,8 +50,11 @@ if !exists('g:vdebug_options')
 endif
 
 if !exists('g:vdebug_keymap')
-    let g:vdebug_keymap = {}
+    let g:vdebug_keymap = g:vdebug_keymap_defaults
+else
+    let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, g:vdebug_keymap)
 endif
+
 
 if !exists('g:vdebug_features')
     let g:vdebug_features = {}
