@@ -59,17 +59,17 @@ let g:vdebug_options_defaults = {
 \   'layout': 'vertical'
 \}
 
-" Load options and keymaps with validation
+" Initialize options and keymaps if not already set
 if !exists('g:vdebug_keymap')
     let g:vdebug_keymap = copy(g:vdebug_keymap_defaults)
 else
-    let g:vdebug_keymap = extend(copy(g:vdebug_keymap_defaults), g:vdebug_keymap)
+    let g:vdebug_keymap = extend(copy(g:vdebug_keymap_defaults), type(g:vdebug_keymap) == type({}) ? g:vdebug_keymap : {})
 endif
 
 if !exists('g:vdebug_options')
     let g:vdebug_options = copy(g:vdebug_options_defaults)
 else
-    let g:vdebug_options = extend(copy(g:vdebug_options_defaults), g:vdebug_options)
+    let g:vdebug_options = extend(copy(g:vdebug_options_defaults), type(g:vdebug_options) == type({}) ? g:vdebug_options : {})
 endif
 
 " Adjust markers for ASCII-only systems
@@ -93,14 +93,16 @@ endfunction
 
 " Reload options with defaults
 function! Vdebug_load_options(options)
-    let a:options = type(a:options) == type({}) ? a:options : {}
-    let g:vdebug_options = extend(copy(g:vdebug_options_defaults), a:options)
+    " Use a local copy to avoid modifying the read-only argument
+    let l:options = type(a:options) == type({}) ? a:options : {}
+    let g:vdebug_options = extend(copy(g:vdebug_options_defaults), l:options)
     call s:DefineSigns()
     python3 debugger.reload_options()
 endfunction
 
 " Reload keymaps with defaults
 function! Vdebug_load_keymaps(keymaps)
+    " Use a local copy to avoid modifying the read-only argument
     let l:keymaps = type(a:keymaps) == type({}) ? a:keymaps : {}
     if empty(l:keymaps)
         echomsg 'Warning: Vdebug keymaps are empty. Using defaults.'
