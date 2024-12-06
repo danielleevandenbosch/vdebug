@@ -239,8 +239,12 @@ endfunction
 " This should be called if you want to update the keymappings after vdebug has
 " been loaded.
 function! Vdebug_load_keymaps(keymaps)
+    if empty(a:keymaps)
+        echomsg 'Warning: Vdebug keymaps are empty. Using defaults.'
+        let a:keymaps = g:vdebug_keymap_defaults
+    endif
+
     " Unmap existing keys, if needed
-    " the keys should in theory exist because they are part of the defaults
     if has_key(g:vdebug_keymap, 'run')
         exe 'silent! nunmap '.g:vdebug_keymap['run']
     endif
@@ -257,13 +261,10 @@ function! Vdebug_load_keymaps(keymaps)
     " Merge keymaps with defaults
     let g:vdebug_keymap = extend(g:vdebug_keymap_defaults, a:keymaps)
 
-    " Mappings allowed in non-debug mode
-    " XXX: don't use keymaps not found in g:vdebug_keymap_defaults
+    " Map keys
     exe 'noremap '.g:vdebug_keymap['run'].' :python3 debugger.run()<cr>'
     exe 'noremap '.g:vdebug_keymap['close'].' :python3 debugger.close()<cr>'
     exe 'noremap '.g:vdebug_keymap['set_breakpoint'].' :python3 debugger.set_breakpoint()<cr>'
-
-    " Exceptional case for visual evaluation
     exe 'vnoremap '.g:vdebug_keymap['eval_visual'].' :python3 debugger.handle_visual_eval()<cr>'
     python3 debugger.reload_keymappings()
 endfunction
